@@ -1,0 +1,83 @@
+void FillTriangleMatrix(int **adj, int **arr, int **tmp)
+{
+
+    for (int i=0; i<m_size; i++)
+        for (int j=0; j<m_size; j++)
+            tmp[i][j] = adj[i][j];
+    int index = EmptyColumnIndex(tmp);
+    triangle_values_order.push_back(index);
+    int k,p;
+    k=0;
+    for (int i = 0; i<m_size; i++)
+    {
+        p = 0;
+        for (int j = 0; j<m_size; j++)
+        {
+            arr[i][j] = adj[triangle_values_order[k]][triangle_values_order[p]];
+            p++;
+        }
+        k++;
+    }
+}
+
+int EmptyColumnIndex(int **arr)
+{
+    int index;
+    while (triangle_values_order.size()!=m_size)
+    {
+        for(int i=0; i<m_size; i++)
+        {
+            int cnt = 0;
+            std::vector<int>::iterator it;
+            it = find (triangle_values_order.begin(), triangle_values_order.end(), i);
+            if (it == triangle_values_order.end())
+            {
+                for(int j=0; j<m_size; j++)
+                {
+                    if(arr[j][i]==INT_MAX || arr[j][i]==0)
+                        cnt++;
+                }
+                if (cnt==m_size)
+                {
+                    triangle_values_order.push_back(i);
+                    index = i;
+                    for (int j=0; j<m_size; j++)
+                    {
+                        arr[index][j] = 0;
+                        arr[j][index] = 0;
+                    }
+                }
+            }
+        }
+    }
+}
+void MaxDistance (int **arr, int start)
+{
+    p_array[start]->mark_max = 0;
+    int i = triangle_values_order[start];
+    do
+    {
+        int status = Max(i, arr,start);
+        if (status) p_array[triangle_values_order[i]]->mark_max = status;
+        i++;
+    }
+    while (i<m_size);
+}
+
+int Max(int i, int **arr, int start)
+{
+    int mx = 0;
+    int value, j = 0;
+    do
+    {
+        if(arr[j][i]!= INT_MAX && arr[j][i]!=0 && p_array[triangle_values_order[j]]->mark_max!=-1)
+        {
+            value = arr[j][i] + p_array[triangle_values_order[j]]->mark_max;
+            if (mx<value) mx = value;
+        }
+            j++;
+
+    }
+    while (j<m_size);
+    return mx;
+}
